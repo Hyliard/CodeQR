@@ -5,37 +5,72 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Genera códigos QR para enlaces de forma rápida y sencilla.">
     <title>Generador de Código QR</title>
+    <meta name="color-scheme" content="light dark">
+    <link rel="icon" type="image/png" href="assets/images/Gaming Logo.png">
     <link rel="stylesheet" href="styles.css">
+    <!-- Aplica el tema antes de pintar para evitar parpadeo -->
+    <script>
+        (() => {
+            const saved = localStorage.getItem('theme');
+            const dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+            document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+        })();
+    </script>
     <script src="assets/js/qrcode.min.js" defer></script>
     <script src="script.js" defer></script>
 </head>
 <body>
     <header class="site-header">
-        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Activar modo oscuro">
-            <img class="theme-toggle__icon theme-toggle__icon--moon" src="assets/icons/moon.svg" alt="" aria-hidden="true">
-            <img class="theme-toggle__icon theme-toggle__icon--sun" src="assets/icons/sun.svg" alt="" aria-hidden="true">
-            <span id="themeText">Modo oscuro</span>
-        </button>
+        <div class="site-header__inner">
+            <!-- Espacio reservado para tu cabecera personalizada -->
+            <div class="site-header__slot"></div>
+
+            <button class="theme-toggle" id="themeToggle" type="button" role="switch" aria-checked="false" aria-label="Modo oscuro">
+                <span class="theme-toggle__track" aria-hidden="true">
+                    <img class="theme-toggle__icon" src="assets/icons/sun.svg" alt="">
+                    <img class="theme-toggle__icon" src="assets/icons/moon.svg" alt="">
+                    <span class="theme-toggle__thumb"></span>
+                </span>
+            </button>
+        </div>
     </header>
 
-    <main class="qr-card">
-        <h1>Generador de Código QR</h1>
-        <p class="intro">Pega un enlace y crea un código listo para escanear.</p>
-        <form id="qrForm" novalidate>
-            <label for="linkInput">Enlace</label>
-            <div class="form-row">
-                <input type="url" id="linkInput" name="link" placeholder="https://ejemplo.com"
-                    autocomplete="url" inputmode="url" required aria-describedby="formMessage">
-                <button class="generate-button" type="submit">Generar QR</button>
-            </div>
-            <p id="formMessage" class="form-message" role="status" aria-live="polite"></p>
-        </form>
-        <section id="qrResult" class="qr-result" aria-label="Código QR generado" hidden>
-            <div id="qrCode" class="qr-code"></div>
-            <p>Escanea el código con la cámara de tu dispositivo.</p>
+    <main class="page">
+        <section class="qr-card">
+            <span class="badge">Rápido · Gratis · Sin registro</span>
+            <h1>Generador de <span class="accent">Código QR</span></h1>
+            <p class="intro">Pega un enlace y crea un código listo para escanear, descargar o compartir.</p>
+
+            <form id="qrForm" novalidate>
+                <label for="linkInput">Enlace</label>
+                <div class="form-row">
+                    <div class="input-wrap">
+                        <span class="input-wrap__icon" aria-hidden="true"></span>
+                        <input type="url" id="linkInput" name="link" placeholder="https://ejemplo.com"
+                            autocomplete="url" inputmode="url" required aria-describedby="formMessage">
+                    </div>
+                    <button class="button button--primary" type="submit">Generar QR</button>
+                </div>
+                <p id="formMessage" class="form-message" role="status" aria-live="polite"></p>
+            </form>
+
+            <section id="qrResult" class="qr-result" aria-label="Código QR generado" hidden>
+                <div class="qr-frame">
+                    <div id="qrCode" class="qr-code"></div>
+                </div>
+                <p id="qrUrl" class="qr-url"></p>
+                <p class="qr-hint">Escanea el código con la cámara de tu dispositivo.</p>
+                <div class="actions">
+                    <button id="downloadButton" class="button button--primary" type="button">Descargar PNG</button>
+                    <button id="copyButton" class="button button--ghost" type="button">Copiar enlace</button>
+                    <button id="resetButton" class="button button--ghost" type="button">Nuevo QR</button>
+                </div>
+            </section>
         </section>
     </main>
 
-    <footer class="site-footer"><p>Generador de Código QR</p></footer>
+    <footer class="site-footer">
+        <!-- Espacio reservado para tu footer personalizado -->
+    </footer>
 </body>
 </html>

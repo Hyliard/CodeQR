@@ -3,8 +3,12 @@ const linkInput = document.querySelector('#linkInput');
 const formMessage = document.querySelector('#formMessage');
 const qrResult = document.querySelector('#qrResult');
 const qrCode = document.querySelector('#qrCode');
+const qrUrl = document.querySelector('#qrUrl');
+const downloadButton = document.querySelector('#downloadButton');
+const copyButton = document.querySelector('#copyButton');
+const resetButton = document.querySelector('#resetButton');
 const themeToggle = document.querySelector('#themeToggle');
-const themeText = document.querySelector('#themeText');
+let currentLink = '';
 
 function normalizeUrl(value) {
     const trimmed = value.trim();
@@ -44,16 +48,19 @@ form.addEventListener('submit', (event) => {
             return;
         }
 
-        linkInput.value = url.href;
+        currentLink = url.href;
+        linkInput.value = currentLink;
         qrCode.replaceChildren();
+        // Oscuro sobre blanco en ambos temas para que siempre sea escaneable
         new QRCode(qrCode, {
-            text: url.href,
-            width: 192,
-            height: 192,
-            colorDark: '#111827',
+            text: currentLink,
+            width: 512,
+            height: 512,
+            colorDark: '#0f172a',
             colorLight: '#ffffff',
             correctLevel: QRCode.CorrectLevel.H
         });
+        qrUrl.textContent = currentLink;
         qrResult.hidden = false;
         formMessage.textContent = 'Código QR generado correctamente.';
         formMessage.classList.add('success');
@@ -65,13 +72,47 @@ form.addEventListener('submit', (event) => {
 
 linkInput.addEventListener('input', clearMessage);
 
+downloadButton.addEventListener('click', () => {
+    const canvas = qrCode.querySelector('canvas');
+    const img = qrCode.querySelector('img');
+    const source = canvas ? canvas.toDataURL('image/png') : img?.src;
+    if (!source) return;
+
+    const anchor = document.createElement('a');
+    anchor.href = source;
+    anchor.download = 'codigo-qr.png';
+    anchor.click();
+});
+
+copyButton.addEventListener('click', async () => {
+    try {
+        await navigator.clipboard.writeText(currentLink);
+        formMessage.textContent = 'Enlace copiado al portapapeles.';
+        formMessage.classList.add('success');
+    } catch {
+        showError('No se pudo copiar el enlace.');
+        qrResult.hidden = false;
+    }
+});
+
+resetButton.addEventListener('click', () => {
+    form.reset();
+    clearMessage();
+    qrCode.replaceChildren();
+    qrResult.hidden = true;
+    currentLink = '';
+    linkInput.focus();
+});
+
 function applyTheme(isDark) {
-    document.body.classList.toggle('dark', isDark);
-    themeText.textContent = isDark ? 'Modo claro' : 'Modo oscuro';
-    themeToggle.setAttribute('aria-label', isDark ? 'Activar modo claro' : 'Activar modo oscuro');
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+    themeToggle.setAttribute('aria-checked', String(isDark));
+    themeToggle.title = isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro';
 }
 
-const storedTheme = localStorage.getItem('theme');
-applyTheme(storedTheme ? storedTheme === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches);
-themeToggle.addEventListener('click', () => applyTheme(!document.body.classList.contains('dark')));
+applyTheme(document.documentElement.dataset.theme === 'dark');
+themeToggle.addEventListener('click', () => {
+    const isDark = document.documentElement.dataset.theme !== 'dark';
+    applyTheme(isDark);
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+});
