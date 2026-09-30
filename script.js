@@ -1,118 +1,101 @@
-const form = document.querySelector('#qrForm');
-const linkInput = document.querySelector('#linkInput');
-const formMessage = document.querySelector('#formMessage');
-const qrResult = document.querySelector('#qrResult');
-const qrCode = document.querySelector('#qrCode');
-const qrUrl = document.querySelector('#qrUrl');
-const downloadButton = document.querySelector('#downloadButton');
-const copyButton = document.querySelector('#copyButton');
-const resetButton = document.querySelector('#resetButton');
-const themeToggle = document.querySelector('#themeToggle');
-let currentLink = '';
+const $ = (sel) => document.querySelector(sel);
 
-function normalizeUrl(value) {
-    const trimmed = value.trim();
-    if (!trimmed) return '';
-    return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+const root = document.documentElement;
+const form = $('#form');
+const input = $('#link');
+const msg = $('#msg');
+const result = $('#result');
+const qr = $('#qr');
+
+let link = '';
+
+function fail(text) {
+    msg.textContent = text;
+    msg.classList.remove('ok');
+    input.setAttribute('aria-invalid', 'true');
+    input.focus();
 }
 
-function showError(message) {
-    formMessage.textContent = message;
-    formMessage.classList.remove('success');
-    linkInput.setAttribute('aria-invalid', 'true');
-    qrResult.hidden = true;
+function notify(text) {
+    msg.textContent = text;
+    msg.classList.add('ok');
 }
 
-function clearMessage() {
-    formMessage.textContent = '';
-    formMessage.classList.remove('success');
-    linkInput.removeAttribute('aria-invalid');
-}
-
-form.addEventListener('submit', (event) => {
-    event.preventDefault();
-    clearMessage();
-    const link = normalizeUrl(linkInput.value);
-
-    if (!link) {
-        showError('Ingresa un enlace para generar el código QR.');
-        linkInput.focus();
-        return;
-    }
+function toUrl(value) {
+    let v = value.trim();
+    if (!/^https?:\/\//i.test(v)) v = 'https://' + v;
 
     try {
-        const url = new URL(link);
-        if (!['http:', 'https:'].includes(url.protocol)) throw new Error();
-        if (typeof QRCode === 'undefined') {
-            showError('No se pudo cargar el generador QR. Recarga la página e inténtalo otra vez.');
-            return;
-        }
-
-        currentLink = url.href;
-        linkInput.value = currentLink;
-        qrCode.replaceChildren();
-        // Oscuro sobre blanco en ambos temas para que siempre sea escaneable
-        new QRCode(qrCode, {
-            text: currentLink,
-            width: 512,
-            height: 512,
-            colorDark: '#0f172a',
-            colorLight: '#ffffff',
-            correctLevel: QRCode.CorrectLevel.H
-        });
-        qrUrl.textContent = currentLink;
-        qrResult.hidden = false;
-        formMessage.textContent = 'Código QR generado correctamente.';
-        formMessage.classList.add('success');
+        return new URL(v);
     } catch {
-        showError('Escribe un enlace válido, por ejemplo: https://ejemplo.com');
-        linkInput.focus();
+        return null;
     }
+}
+
+form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    result.hidden = true;
+
+    if (!input.value.trim()) return fail('Pega un enlace primero.');
+
+    const url = toUrl(input.value);
+    if (!url) return fail('Ese enlace no es válido. Ej: https://ejemplo.com');
+    if (!window.QRCode) return fail('No cargó la librería del QR, recarga la página.');
+
+    link = url.href;
+    input.value = link;
+    qr.replaceChildren();
+
+    new QRCode(qr, {
+        text: link,
+        width: 512,
+        height: 512,
+        colorDark: '#1e1e2e',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.H
+    });
+
+    $('#qrLink').textContent = link;
+    result.hidden = false;
+    notify('QR generado.');
 });
 
-linkInput.addEventListener('input', clearMessage);
-
-downloadButton.addEventListener('click', () => {
-    const canvas = qrCode.querySelector('canvas');
-    const img = qrCode.querySelector('img');
-    const source = canvas ? canvas.toDataURL('image/png') : img?.src;
-    if (!source) return;
-
-    const anchor = document.createElement('a');
-    anchor.href = source;
-    anchor.download = 'codigo-qr.png';
-    anchor.click();
+input.addEventListener('input', () => {
+    msg.textContent = '';
+    input.removeAttribute('aria-invalid');
 });
 
-copyButton.addEventListener('click', async () => {
+$('#download').addEventListener('click', () => {
+    const canvas = qr.querySelector('canvas');
+    if (!canvas) return;
+
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    a.download = 'qr.png';
+    a.click();
+});
+
+$('#copy').addEventListener('click', async () => {
     try {
-        await navigator.clipboard.writeText(currentLink);
-        formMessage.textContent = 'Enlace copiado al portapapeles.';
-        formMessage.classList.add('success');
+        await navigator.clipboard.writeText(link);
+        notify('Enlace copiado.');
     } catch {
-        showError('No se pudo copiar el enlace.');
-        qrResult.hidden = false;
+        msg.classList.remove('ok');
+        msg.textContent = 'No se pudo copiar.';
     }
 });
 
-resetButton.addEventListener('click', () => {
+$('#reset').addEventListener('click', () => {
     form.reset();
-    clearMessage();
-    qrCode.replaceChildren();
-    qrResult.hidden = true;
-    currentLink = '';
-    linkInput.focus();
+    msg.textContent = '';
+    qr.replaceChildren();
+    result.hidden = true;
+    link = '';
+    input.focus();
 });
 
-function applyTheme(isDark) {
-    document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
-    themeToggle.setAttribute('aria-checked', String(isDark));
-    themeToggle.title = isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro';
-}
-
-applyTheme(document.documentElement.dataset.theme === 'dark');
-themeToggle.addEventListener('click', () => {
-    const isDark = document.documentElement.dataset.theme !== 'dark';
-    applyTheme(isDark);
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+$('#theme').addEventListener('click', () => {
+    const theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
+    root.dataset.theme = theme;
+    localStorage.setItem('theme', theme);
 });
