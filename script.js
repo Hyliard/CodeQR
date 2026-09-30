@@ -50,7 +50,7 @@ form.addEventListener('submit', (e) => {
         text: link,
         width: 512,
         height: 512,
-        colorDark: '#1e1e2e',
+        colorDark: '#1a1b26',
         colorLight: '#ffffff',
         correctLevel: QRCode.CorrectLevel.H
     });
