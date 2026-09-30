@@ -26,15 +26,44 @@
     <main>
         <section class="card">
             <h1>Generador de QR</h1>
-            <p>Pega un enlace y descarga su código QR.</p>
+            <p>Crea un QR para un enlace o para que se conecten a tu WiFi.</p>
+
+            <div class="tabs" role="tablist">
+                <button class="tab active" type="button" role="tab" data-mode="url" aria-selected="true">Enlace</button>
+                <button class="tab" type="button" role="tab" data-mode="wifi" aria-selected="false">WiFi</button>
+            </div>
 
             <form id="form" novalidate>
-                <label for="link">Enlace</label>
-                <div class="row">
-                    <input type="url" id="link" placeholder="https://ejemplo.com"
-                        autocomplete="url" inputmode="url" aria-describedby="msg">
-                    <button class="btn primary" type="submit">Generar</button>
+                <div id="urlFields">
+                    <label for="link">Enlace</label>
+                    <div class="row">
+                        <input type="url" id="link" placeholder="https://ejemplo.com"
+                            autocomplete="url" inputmode="url" aria-describedby="msg">
+                        <button class="btn primary" type="submit">Generar</button>
+                    </div>
                 </div>
+
+                <div id="wifiFields" class="wifi" hidden>
+                    <label class="wide">Nombre de la red
+                        <input id="ssid" placeholder="MiCasa_5G" autocomplete="off" spellcheck="false">
+                    </label>
+                    <label>Contraseña
+                        <input id="pass" type="password" autocomplete="off" spellcheck="false">
+                    </label>
+                    <label>Seguridad
+                        <select id="security">
+                            <option value="WPA">WPA / WPA2</option>
+                            <option value="WEP">WEP</option>
+                            <option value="nopass">Sin contraseña</option>
+                        </select>
+                    </label>
+                    <div class="checks wide">
+                        <label class="check"><input id="show" type="checkbox"> Mostrar contraseña</label>
+                        <label class="check"><input id="hiddenNet" type="checkbox"> Red oculta</label>
+                    </div>
+                    <button class="btn primary wide" type="submit">Generar</button>
+                </div>
+
                 <p id="msg" class="msg" role="status" aria-live="polite"></p>
             </form>
 

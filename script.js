@@ -13,12 +13,13 @@ const H = poster.height;
 const FONT = 'system-ui, "Segoe UI", Roboto, sans-serif';
 
 let link = '';
+let mode = 'url';
 
-function fail(text) {
+function fail(text, el = input) {
     msg.textContent = text;
     msg.classList.remove('ok');
-    input.setAttribute('aria-invalid', 'true');
-    input.focus();
+    el.setAttribute('aria-invalid', 'true');
+    el.focus();
 }
 
 function notify(text) {
@@ -41,18 +42,15 @@ form.addEventListener('submit', (e) => {
     e.preventDefault();
     result.hidden = true;
 
-    if (!input.value.trim()) return fail('Pega un enlace primero.');
-
-    const url = toUrl(input.value);
-    if (!url) return fail('Ese enlace no es válido. Ej: https://ejemplo.com');
     if (!window.QRCode) return fail('No cargó la librería del QR, recarga la página.');
 
-    link = url.href;
-    input.value = link;
+    const data = mode === 'wifi' ? readWifi() : readUrl();
+    if (!data) return;
+
     qr.replaceChildren();
 
     new QRCode(qr, {
-        text: link,
+        text: data,
         width: 512,
         height: 512,
         colorDark: '#1a1b26',
@@ -65,9 +63,64 @@ form.addEventListener('submit', (e) => {
     notify('QR generado.');
 });
 
-input.addEventListener('input', () => {
+function readUrl() {
+    if (!input.value.trim()) return fail('Pega un enlace primero.');
+
+    const url = toUrl(input.value);
+    if (!url) return fail('Ese enlace no es válido. Ej: https://ejemplo.com');
+
+    link = url.href;
+    input.value = link;
+    return link;
+}
+
+// formato estándar que leen las cámaras de Android e iOS
+function readWifi() {
+    const ssid = $('#ssid');
+    const pass = $('#pass');
+    const type = $('#security').value;
+    const esc = (s) => s.replace(/([\\;,:"])/g, '\\$1');
+
+    if (!ssid.value.trim()) return fail('Falta el nombre de la red.', ssid);
+    if (type !== 'nopass' && !pass.value) return fail('Falta la contraseña.', pass);
+
+    const p = type === 'nopass' ? '' : `P:${esc(pass.value)};`;
+    const h = $('#hiddenNet').checked ? 'H:true;' : '';
+    return `WIFI:T:${type};S:${esc(ssid.value)};${p}${h};`;
+}
+
+function setMode(next) {
+    mode = next;
+
+    document.querySelectorAll('.tab').forEach((tab) => {
+        const on = tab.dataset.mode === mode;
+        tab.classList.toggle('active', on);
+        tab.setAttribute('aria-selected', on);
+    });
+
+    $('#urlFields').hidden = mode !== 'url';
+    $('#wifiFields').hidden = mode !== 'wifi';
+    $('#copy').hidden = mode !== 'url';
+    $('#title').value = mode === 'wifi' ? 'Conectate al WiFi' : '¡Escaneá el QR!';
     msg.textContent = '';
-    input.removeAttribute('aria-invalid');
+    result.hidden = true;
+}
+
+document.querySelectorAll('.tab').forEach((tab) => {
+    tab.addEventListener('click', () => setMode(tab.dataset.mode));
+});
+
+$('#show').addEventListener('change', (e) => {
+    $('#pass').type = e.target.checked ? 'text' : 'password';
+});
+
+$('#security').addEventListener('change', (e) => {
+    $('#pass').disabled = e.target.value === 'nopass';
+});
+
+form.addEventListener('input', (e) => {
+    msg.textContent = '';
+    e.target.removeAttribute('aria-invalid');
 });
 
 function fileName(suffix = '') {
@@ -164,11 +217,13 @@ $('#copy').addEventListener('click', async () => {
 
 $('#reset').addEventListener('click', () => {
     form.reset();
+    $('#pass').type = 'password';
+    $('#pass').disabled = false;
     msg.textContent = '';
     qr.replaceChildren();
     result.hidden = true;
     link = '';
-    input.focus();
+    (mode === 'wifi' ? $('#ssid') : input).focus();
 });
 
 $('#theme').addEventListener('click', () => {

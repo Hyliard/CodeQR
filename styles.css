@@ -31,6 +31,8 @@
 
 * { box-sizing: border-box; }
 
+[hidden] { display: none !important; }
+
 body {
     margin: 0;
     min-height: 100vh;
@@ -42,7 +44,7 @@ body {
     line-height: 1.5;
 }
 
-button, input { font: inherit; color: inherit; }
+button, input, select { font: inherit; color: inherit; }
 
 .header {
     display: flex;
@@ -95,7 +97,30 @@ main {
 }
 
 h1 { margin: 0 0 4px; font-size: 1.75rem; }
-.card > p { margin: 0 0 24px; color: var(--muted); }
+.card > p { margin: 0 0 20px; color: var(--muted); }
+
+.tabs {
+    display: inline-flex;
+    gap: 4px;
+    margin-bottom: 20px;
+    padding: 4px;
+    background: var(--field);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+}
+
+.tab {
+    padding: 6px 18px;
+    background: none;
+    border: 0;
+    border-radius: 7px;
+    color: var(--muted);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.tab:hover { color: var(--text); }
+.tab.active { background: var(--accent); color: var(--on-accent); }
 
 label {
     display: block;
@@ -106,7 +131,35 @@ label {
 
 .row { display: flex; gap: 8px; }
 
-input {
+.wifi {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.wifi label { margin: 0; }
+.wide { grid-column: 1 / -1; }
+
+.checks { display: flex; flex-wrap: wrap; gap: 8px 24px; }
+
+.check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 400;
+    cursor: pointer;
+}
+
+.check input {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    padding: 0;
+    accent-color: var(--accent);
+}
+
+input, select {
     flex: auto;
     min-width: 0;
     height: 44px;
@@ -116,8 +169,10 @@ input {
     border-radius: 8px;
 }
 
+input:disabled { opacity: .5; }
+
 input::placeholder { color: var(--placeholder); }
-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); }
+input:focus, select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); }
 input[aria-invalid="true"] { border-color: var(--red); }
 
 .btn {
@@ -171,7 +226,7 @@ button:focus-visible {
 
 .fields .wide { grid-column: 1 / -1; }
 .fields label { margin: 0; }
-.fields input { width: 100%; margin-top: 4px; font-weight: 400; }
+.fields input, .wifi input:not([type="checkbox"]), .wifi select { width: 100%; margin-top: 4px; font-weight: 400; }
 
 input[type="color"] { padding: 4px; cursor: pointer; }
 
@@ -199,4 +254,5 @@ input[type="color"] { padding: 4px; cursor: pointer; }
     .card { padding: 24px 20px; }
     .row { flex-direction: column; }
     .fields { grid-template-columns: 1fr; }
+    .wifi { grid-template-columns: 1fr; }
 }
