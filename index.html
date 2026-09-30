@@ -32,7 +32,6 @@
                 <button class="tab active" type="button" role="tab" data-mode="url" aria-selected="true">Enlace</button>
                 <button class="tab" type="button" role="tab" data-mode="wifi" aria-selected="false">WiFi</button>
                 <button class="tab" type="button" role="tab" data-mode="contact" aria-selected="false">Contacto</button>
-                <button class="tab" type="button" role="tab" data-mode="email" aria-selected="false">Email</button>
                 <button class="tab" type="button" role="tab" data-mode="sms" aria-selected="false">SMS</button>
                 <button class="tab" type="button" role="tab" data-mode="tel" aria-selected="false">Teléfono</button>
                 <button class="tab" type="button" role="tab" data-mode="geo" aria-selected="false">Ubicación</button>
@@ -75,12 +74,6 @@
                     <label>Cargo <input id="cRole" autocomplete="organization-title"></label>
                     <label class="wide">Sitio web <input id="cWeb" type="url" placeholder="https://"></label>
                     <label class="wide">Dirección <input id="cAddr" autocomplete="street-address"></label>
-                </div>
-
-                <div class="panel grid" data-mode="email" hidden>
-                    <label class="wide">Para <input id="mTo" type="email" placeholder="nombre@correo.com"></label>
-                    <label class="wide">Asunto <input id="mSubject"></label>
-                    <label class="wide">Mensaje <textarea id="mBody" rows="3"></textarea></label>
                 </div>
 
                 <div class="panel grid" data-mode="sms" hidden>

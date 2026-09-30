@@ -19,7 +19,6 @@ const TITLES = {
     url: '¡Escaneá el QR!',
     wifi: 'Conectate al WiFi',
     contact: 'Guardá mi contacto',
-    email: 'Escribime',
     sms: 'Mandame un SMS',
     tel: 'Llamame',
     geo: '¿Cómo llegar?',
@@ -141,18 +140,6 @@ function readContact() {
     return lines.join('\r\n');
 }
 
-function readEmail() {
-    const to = val('mTo');
-    if (!EMAIL.test(to)) return fail('Revisá el email de destino.', $('#mTo'));
-
-    const query = [['subject', val('mSubject')], ['body', val('mBody')]]
-        .filter(([, v]) => v)
-        .map(([k, v]) => `${k}=${encodeURIComponent(v)}`)
-        .join('&');
-
-    return `mailto:${to}${query ? `?${query}` : ''}`;
-}
-
 function readSms() {
     const num = digits(val('sPhone'));
     if (!PHONE.test(num)) return fail('Revisá el número.', $('#sPhone'));
@@ -211,7 +198,6 @@ const readers = {
     url: readUrl,
     wifi: readWifi,
     contact: readContact,
-    email: readEmail,
     sms: readSms,
     tel: readTel,
     geo: readGeo,

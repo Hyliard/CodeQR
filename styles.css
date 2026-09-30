@@ -7,8 +7,8 @@
     --placeholder: #9ca0b0;
     --text: #4c4f69;
     --muted: #6c6f85;
-    --accent: #8839ef;
-    --on-accent: #eff1f5;
+    --accent: #343b58;
+    --on-accent: #f5f6f9;
     --red: #d20f39;
     --green: #40a02b;
     color-scheme: light;
@@ -100,29 +100,25 @@ h1 { margin: 0 0 4px; font-size: 1.75rem; }
 .card > p { margin: 0 0 20px; color: var(--muted); }
 
 .tabs {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 4px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
     margin-bottom: 20px;
-    padding: 4px;
-    background: var(--field);
-    border: 1px solid var(--border);
-    border-radius: 10px;
 }
 
 .tab {
-    padding: 6px 4px;
-    background: none;
-    border: 0;
-    border-radius: 7px;
+    padding: 6px 14px;
+    background: var(--field);
+    border: 1px solid var(--border);
+    border-radius: 999px;
     color: var(--muted);
     font-size: .875rem;
     font-weight: 600;
     cursor: pointer;
 }
 
-.tab:hover { color: var(--text); }
-.tab.active { background: var(--accent); color: var(--on-accent); }
+.tab:hover { color: var(--text); border-color: var(--accent); }
+.tab.active { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 
 label {
     display: block;
