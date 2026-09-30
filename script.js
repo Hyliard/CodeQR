@@ -13,7 +13,6 @@ const H = poster.height;
 const FONT = 'system-ui, "Segoe UI", Roboto, sans-serif';
 
 let link = '';
-let logo = null;
 
 function fail(text) {
     msg.textContent = text;
@@ -90,32 +89,15 @@ function ink(hex) {
     return lum > 160 ? '#1a1b26' : '#ffffff';
 }
 
-function wrap(ctx, text, max) {
-    const lines = [];
-    let line = '';
-
-    for (const word of text.split(/\s+/)) {
-        const next = line ? `${line} ${word}` : word;
-        if (line && ctx.measureText(next).width > max) {
-            lines.push(line);
-            line = word;
-        } else {
-            line = next;
-        }
-    }
-
-    if (line) lines.push(line);
-    return lines;
-}
-
 function corners(ctx, x, y, size, color) {
-    const l = 90;
+    const l = 110;
     const end = x + size;
     const bottom = y + size;
 
     ctx.strokeStyle = color;
-    ctx.lineWidth = 10;
-    ctx.lineCap = 'square';
+    ctx.lineWidth = 12;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
     ctx.beginPath();
     ctx.moveTo(x, y + l); ctx.lineTo(x, y); ctx.lineTo(x + l, y);
     ctx.moveTo(end - l, y); ctx.lineTo(end, y); ctx.lineTo(end, y + l);
@@ -130,77 +112,38 @@ function drawPoster() {
 
     const ctx = poster.getContext('2d');
     const color = $('#color').value;
-    const name = $('#name').value.trim();
     const title = $('#title').value.trim();
-    const text = $('#text').value.trim();
 
+    ctx.clearRect(0, 0, W, H);
     ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, W, H);
-
-    ctx.fillStyle = '#f1f2f6';
     ctx.beginPath();
-    ctx.roundRect(60, 0, W - 120, 200, [0, 0, 60, 60]);
+    ctx.roundRect(0, 0, W, H, 80);
     ctx.fill();
 
-    ctx.textBaseline = 'middle';
-
-    if (logo) {
-        const s = Math.min(110 / logo.height, 600 / logo.width);
-        ctx.drawImage(logo, 120, 100 - logo.height * s / 2, logo.width * s, logo.height * s);
-    } else if (name) {
-        ctx.fillStyle = color;
+    if (title) {
         ctx.font = `bold 64px ${FONT}`;
-        ctx.textAlign = 'left';
-        ctx.fillText(name, 120, 100, W - 240);
+        const w = Math.min(ctx.measureText(title).width + 140, W - 120);
+
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.roundRect((W - w) / 2, 100, w, 130, 65);
+        ctx.fill();
+
+        ctx.fillStyle = ink(color);
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(title, W / 2, 167, w - 100);
     }
 
-    ctx.fillStyle = '#1a1b26';
-    ctx.font = `bold 72px ${FONT}`;
-    ctx.textAlign = 'center';
-    ctx.fillText(title, W / 2, 310, W - 160);
-
-    const size = 560;
+    const size = 740;
     const x = (W - size) / 2;
-    const y = 420;
+    const y = 370;
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(src, x, y, size, size);
-    corners(ctx, x - 40, y - 40, size + 80, color);
-
-    const top = 1100;
-    ctx.fillStyle = color;
-    ctx.beginPath();
-    ctx.roundRect(60, top, W - 120, H - top, [60, 60, 0, 0]);
-    ctx.fill();
-
-    ctx.fillStyle = ink(color);
-    ctx.font = `bold 52px ${FONT}`;
-    wrap(ctx, text, W - 280).slice(0, 3).forEach((line, i) => {
-        ctx.fillText(line, W / 2, top + 130 + i * 72);
-    });
-
-    ctx.globalAlpha = .8;
-    ctx.font = `32px ${FONT}`;
-    ctx.fillText(link, W / 2, H - 90, W - 240);
-    ctx.globalAlpha = 1;
+    corners(ctx, x - 45, y - 45, size + 90, color);
 }
 
 $('#fields').addEventListener('input', drawPoster);
-
-$('#logo').addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (!file) {
-        logo = null;
-        return drawPoster();
-    }
-
-    const img = new Image();
-    img.onload = () => {
-        URL.revokeObjectURL(img.src);
-        logo = img;
-        drawPoster();
-    };
-    img.src = URL.createObjectURL(file);
-});
 
 $('#download').addEventListener('click', () => {
     const canvas = qr.querySelector('canvas');

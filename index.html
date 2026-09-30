@@ -42,24 +42,18 @@
                 <div id="qr"></div>
 
                 <div id="fields" class="fields">
-                    <label>Nombre
-                        <input id="name" placeholder="mi-negocio" maxlength="60">
+                    <label>Nombre del archivo
+                        <input id="name" placeholder="qr" maxlength="60">
                     </label>
                     <label>Título
-                        <input id="title" value="¡Escaneá el QR!" maxlength="40">
+                        <input id="title" value="¡Escaneá el QR!" maxlength="30">
                     </label>
-                    <label class="wide">Texto
-                        <input id="text" value="Apuntá la cámara de tu celular al código" maxlength="120">
-                    </label>
-                    <label>Color
+                    <label class="wide">Color
                         <input id="color" type="color" value="#3d59a1">
-                    </label>
-                    <label>Logo
-                        <input id="logo" type="file" accept="image/*">
                     </label>
                 </div>
 
-                <canvas id="poster" width="1200" height="1650" aria-label="Vista previa del cartel"></canvas>
+                <canvas id="poster" width="1200" height="1250" aria-label="Vista previa del cartel"></canvas>
 
                 <div class="actions">
                     <button id="download" class="btn" type="button">Descargar QR</button>

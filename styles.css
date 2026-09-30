@@ -174,17 +174,6 @@ button:focus-visible {
 .fields input { width: 100%; margin-top: 4px; font-weight: 400; }
 
 input[type="color"] { padding: 4px; cursor: pointer; }
-input[type="file"] { padding: 8px; font-size: .8rem; }
-
-input[type="file"]::file-selector-button {
-    margin-right: 8px;
-    padding: 2px 10px;
-    background: var(--panel);
-    color: inherit;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    cursor: pointer;
-}
 
 /* el cartel es blanco siempre, así se ve igual que al imprimirlo */
 #poster {
@@ -193,8 +182,7 @@ input[type="file"]::file-selector-button {
     max-width: 100%;
     height: auto;
     margin: 24px auto 0;
-    border-radius: 8px;
-    box-shadow: 0 8px 24px rgb(0 0 0 / .18);
+    filter: drop-shadow(0 8px 20px rgb(0 0 0 / .18));
 }
 
 .actions {
