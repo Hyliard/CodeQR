@@ -44,7 +44,7 @@ body {
     line-height: 1.5;
 }
 
-button, input, select { font: inherit; color: inherit; }
+button, input, select, textarea { font: inherit; color: inherit; }
 
 .header {
     display: flex;
@@ -100,7 +100,8 @@ h1 { margin: 0 0 4px; font-size: 1.75rem; }
 .card > p { margin: 0 0 20px; color: var(--muted); }
 
 .tabs {
-    display: inline-flex;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
     gap: 4px;
     margin-bottom: 20px;
     padding: 4px;
@@ -110,11 +111,12 @@ h1 { margin: 0 0 4px; font-size: 1.75rem; }
 }
 
 .tab {
-    padding: 6px 18px;
+    padding: 6px 4px;
     background: none;
     border: 0;
     border-radius: 7px;
     color: var(--muted);
+    font-size: .875rem;
     font-weight: 600;
     cursor: pointer;
 }
@@ -131,14 +133,18 @@ label {
 
 .row { display: flex; gap: 8px; }
 
-.wifi {
+.grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 12px;
 }
 
-.wifi label { margin: 0; }
+.grid > label { margin: 0; }
 .wide { grid-column: 1 / -1; }
+
+.note { margin: 0; font-size: .8rem; color: var(--muted); }
+
+.generate { width: 100%; margin-top: 16px; }
 
 .checks { display: flex; flex-wrap: wrap; gap: 8px 24px; }
 
@@ -159,7 +165,7 @@ label {
     accent-color: var(--accent);
 }
 
-input, select {
+input, select, textarea {
     flex: auto;
     min-width: 0;
     height: 44px;
@@ -169,11 +175,13 @@ input, select {
     border-radius: 8px;
 }
 
+textarea { height: auto; padding: 10px 12px; resize: vertical; }
+
 input:disabled { opacity: .5; }
 
-input::placeholder { color: var(--placeholder); }
-input:focus, select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); }
-input[aria-invalid="true"] { border-color: var(--red); }
+input::placeholder, textarea::placeholder { color: var(--placeholder); }
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); }
+[aria-invalid="true"] { border-color: var(--red); }
 
 .btn {
     height: 44px;
@@ -226,7 +234,16 @@ button:focus-visible {
 
 .fields .wide { grid-column: 1 / -1; }
 .fields label { margin: 0; }
-.fields input, .wifi input:not([type="checkbox"]), .wifi select { width: 100%; margin-top: 4px; font-weight: 400; }
+
+.fields input,
+.grid > label > input:not([type="checkbox"]),
+.grid > label > select,
+.grid > label > textarea {
+    display: block;
+    width: 100%;
+    margin-top: 4px;
+    font-weight: 400;
+}
 
 input[type="color"] { padding: 4px; cursor: pointer; }
 
@@ -254,5 +271,5 @@ input[type="color"] { padding: 4px; cursor: pointer; }
     .card { padding: 24px 20px; }
     .row { flex-direction: column; }
     .fields { grid-template-columns: 1fr; }
-    .wifi { grid-template-columns: 1fr; }
+    .grid { grid-template-columns: 1fr; }
 }

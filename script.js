@@ -15,9 +15,29 @@ const FONT = 'system-ui, "Segoe UI", Roboto, sans-serif';
 let link = '';
 let mode = 'url';
 
+const TITLES = {
+    url: '¡Escaneá el QR!',
+    wifi: 'Conectate al WiFi',
+    contact: 'Guardá mi contacto',
+    email: 'Escribime',
+    sms: 'Mandame un SMS',
+    tel: 'Llamame',
+    geo: '¿Cómo llegar?',
+    event: 'Agendalo'
+};
+
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PHONE = /^\+?\d{6,15}$/;
+
+const val = (id) => $(`#${id}`).value.trim();
+const digits = (s) => s.replace(/[^\d+]/g, '');
+// escape de vCard / iCalendar
+const escText = (s) => s.replace(/([\\,;])/g, '\\$1').replace(/\n/g, '\\n');
+
 function fail(text, el = input) {
     msg.textContent = text;
     msg.classList.remove('ok');
+    if (!el) return;
     el.setAttribute('aria-invalid', 'true');
     el.focus();
 }
@@ -42,21 +62,26 @@ form.addEventListener('submit', (e) => {
     e.preventDefault();
     result.hidden = true;
 
-    if (!window.QRCode) return fail('No cargó la librería del QR, recarga la página.');
+    if (!window.QRCode) return fail('No cargó la librería del QR, recarga la página.', null);
 
-    const data = mode === 'wifi' ? readWifi() : readUrl();
+    const data = readers[mode]();
     if (!data) return;
 
     qr.replaceChildren();
 
-    new QRCode(qr, {
-        text: data,
-        width: 512,
-        height: 512,
-        colorDark: '#1a1b26',
-        colorLight: '#ffffff',
-        correctLevel: QRCode.CorrectLevel.H
-    });
+    try {
+        new QRCode(qr, {
+            text: data,
+            width: 512,
+            height: 512,
+            colorDark: '#1a1b26',
+            colorLight: '#ffffff',
+            // con textos largos (vCard, eventos) el nivel H no entra
+            correctLevel: data.length > 250 ? QRCode.CorrectLevel.M : QRCode.CorrectLevel.H
+        });
+    } catch {
+        return fail('Es demasiado texto para un QR, acortalo un poco.', null);
+    }
 
     drawPoster();
     result.hidden = false;
@@ -89,6 +114,110 @@ function readWifi() {
     return `WIFI:T:${type};S:${esc(ssid.value)};${p}${h};`;
 }
 
+function readContact() {
+    const first = val('cFirst');
+    const last = val('cLast');
+    if (!first && !last) return fail('Poné al menos el nombre.', $('#cFirst'));
+
+    const email = val('cEmail');
+    if (email && !EMAIL.test(email)) return fail('Revisá el email.', $('#cEmail'));
+
+    const lines = [
+        'BEGIN:VCARD',
+        'VERSION:3.0',
+        `N:${escText(last)};${escText(first)};;;`,
+        `FN:${escText(`${first} ${last}`.trim())}`
+    ];
+
+    const add = (key, v) => v && lines.push(`${key}:${v}`);
+    add('TEL;TYPE=CELL', digits(val('cPhone')));
+    add('EMAIL', email);
+    add('ORG', escText(val('cOrg')));
+    add('TITLE', escText(val('cRole')));
+    add('URL', val('cWeb'));
+    add('ADR', val('cAddr') && `;;${escText(val('cAddr'))};;;;`);
+    lines.push('END:VCARD');
+
+    return lines.join('\r\n');
+}
+
+function readEmail() {
+    const to = val('mTo');
+    if (!EMAIL.test(to)) return fail('Revisá el email de destino.', $('#mTo'));
+
+    const query = [['subject', val('mSubject')], ['body', val('mBody')]]
+        .filter(([, v]) => v)
+        .map(([k, v]) => `${k}=${encodeURIComponent(v)}`)
+        .join('&');
+
+    return `mailto:${to}${query ? `?${query}` : ''}`;
+}
+
+function readSms() {
+    const num = digits(val('sPhone'));
+    if (!PHONE.test(num)) return fail('Revisá el número.', $('#sPhone'));
+    return `SMSTO:${num}:${val('sBody')}`;
+}
+
+function readTel() {
+    const num = digits(val('tPhone'));
+    if (!PHONE.test(num)) return fail('Revisá el número.', $('#tPhone'));
+    return `tel:${num}`;
+}
+
+// link de Maps y no geo:, la cámara de iOS no abre geo:
+function readGeo() {
+    const m = val('geo').match(/^(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)$/);
+    const lat = m && +m[1];
+    const lng = m && +m[2];
+
+    if (!m || Math.abs(lat) > 90 || Math.abs(lng) > 180) {
+        return fail('Usá el formato latitud, longitud. Ej: -34.6037, -58.3816', $('#geo'));
+    }
+
+    return `https://maps.google.com/?q=${lat},${lng}`;
+}
+
+function readEvent() {
+    const title = val('eTitle');
+    const start = $('#eStart').value;
+    const end = $('#eEnd').value;
+
+    if (!title) return fail('Ponele un título al evento.', $('#eTitle'));
+    if (!start) return fail('Falta la fecha de inicio.', $('#eStart'));
+
+    const from = new Date(start);
+    const to = end ? new Date(end) : new Date(from.getTime() + 3600000);
+    if (to <= from) return fail('El fin tiene que ser después del inicio.', $('#eEnd'));
+
+    const stamp = (d) => d.toISOString().replace(/[-:]|\.\d{3}/g, '');
+    const lines = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'BEGIN:VEVENT',
+        `SUMMARY:${escText(title)}`,
+        `DTSTART:${stamp(from)}`,
+        `DTEND:${stamp(to)}`
+    ];
+
+    if (val('ePlace')) lines.push(`LOCATION:${escText(val('ePlace'))}`);
+    if (val('eNotes')) lines.push(`DESCRIPTION:${escText(val('eNotes'))}`);
+    lines.push('END:VEVENT', 'END:VCALENDAR');
+
+    return lines.join('\r\n');
+}
+
+const readers = {
+    url: readUrl,
+    wifi: readWifi,
+    contact: readContact,
+    email: readEmail,
+    sms: readSms,
+    tel: readTel,
+    geo: readGeo,
+    event: readEvent
+};
+
 function setMode(next) {
     mode = next;
 
@@ -98,16 +227,35 @@ function setMode(next) {
         tab.setAttribute('aria-selected', on);
     });
 
-    $('#urlFields').hidden = mode !== 'url';
-    $('#wifiFields').hidden = mode !== 'wifi';
+    document.querySelectorAll('.panel').forEach((panel) => {
+        panel.hidden = panel.dataset.mode !== mode;
+    });
+
     $('#copy').hidden = mode !== 'url';
-    $('#title').value = mode === 'wifi' ? 'Conectate al WiFi' : '¡Escaneá el QR!';
+    $('#title').value = TITLES[mode];
     msg.textContent = '';
     result.hidden = true;
 }
 
 document.querySelectorAll('.tab').forEach((tab) => {
     tab.addEventListener('click', () => setMode(tab.dataset.mode));
+});
+
+$('#locate').addEventListener('click', () => {
+    const geo = $('#geo');
+    if (!navigator.geolocation) return fail('Tu navegador no comparte la ubicación.', geo);
+
+    msg.classList.remove('ok');
+    msg.textContent = 'Buscando ubicación...';
+
+    navigator.geolocation.getCurrentPosition(
+        ({ coords }) => {
+            geo.value = `${coords.latitude.toFixed(6)}, ${coords.longitude.toFixed(6)}`;
+            geo.removeAttribute('aria-invalid');
+            notify('Ubicación lista.');
+        },
+        () => fail('No se pudo obtener tu ubicación. Pegala a mano.', geo)
+    );
 });
 
 $('#show').addEventListener('change', (e) => {
@@ -223,7 +371,7 @@ $('#reset').addEventListener('click', () => {
     qr.replaceChildren();
     result.hidden = true;
     link = '';
-    (mode === 'wifi' ? $('#ssid') : input).focus();
+    $(`.panel[data-mode="${mode}"] input`).focus();
 });
 
 $('#theme').addEventListener('click', () => {

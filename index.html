@@ -26,24 +26,27 @@
     <main>
         <section class="card">
             <h1>Generador de QR</h1>
-            <p>Crea un QR para un enlace o para que se conecten a tu WiFi.</p>
+            <p>Enlaces, WiFi, contactos, mensajes, ubicaciones y eventos.</p>
 
             <div class="tabs" role="tablist">
                 <button class="tab active" type="button" role="tab" data-mode="url" aria-selected="true">Enlace</button>
                 <button class="tab" type="button" role="tab" data-mode="wifi" aria-selected="false">WiFi</button>
+                <button class="tab" type="button" role="tab" data-mode="contact" aria-selected="false">Contacto</button>
+                <button class="tab" type="button" role="tab" data-mode="email" aria-selected="false">Email</button>
+                <button class="tab" type="button" role="tab" data-mode="sms" aria-selected="false">SMS</button>
+                <button class="tab" type="button" role="tab" data-mode="tel" aria-selected="false">Teléfono</button>
+                <button class="tab" type="button" role="tab" data-mode="geo" aria-selected="false">Ubicación</button>
+                <button class="tab" type="button" role="tab" data-mode="event" aria-selected="false">Evento</button>
             </div>
 
             <form id="form" novalidate>
-                <div id="urlFields">
-                    <label for="link">Enlace</label>
-                    <div class="row">
-                        <input type="url" id="link" placeholder="https://ejemplo.com"
-                            autocomplete="url" inputmode="url" aria-describedby="msg">
-                        <button class="btn primary" type="submit">Generar</button>
-                    </div>
+                <div class="panel grid" data-mode="url">
+                    <label class="wide">Enlace
+                        <input type="url" id="link" placeholder="https://ejemplo.com" autocomplete="url" inputmode="url">
+                    </label>
                 </div>
 
-                <div id="wifiFields" class="wifi" hidden>
+                <div class="panel grid" data-mode="wifi" hidden>
                     <label class="wide">Nombre de la red
                         <input id="ssid" placeholder="MiCasa_5G" autocomplete="off" spellcheck="false">
                     </label>
@@ -61,9 +64,54 @@
                         <label class="check"><input id="show" type="checkbox"> Mostrar contraseña</label>
                         <label class="check"><input id="hiddenNet" type="checkbox"> Red oculta</label>
                     </div>
-                    <button class="btn primary wide" type="submit">Generar</button>
                 </div>
 
+                <div class="panel grid" data-mode="contact" hidden>
+                    <label>Nombre <input id="cFirst" autocomplete="given-name"></label>
+                    <label>Apellido <input id="cLast" autocomplete="family-name"></label>
+                    <label>Teléfono <input id="cPhone" type="tel" autocomplete="tel"></label>
+                    <label>Email <input id="cEmail" type="email" autocomplete="email"></label>
+                    <label>Empresa <input id="cOrg" autocomplete="organization"></label>
+                    <label>Cargo <input id="cRole" autocomplete="organization-title"></label>
+                    <label class="wide">Sitio web <input id="cWeb" type="url" placeholder="https://"></label>
+                    <label class="wide">Dirección <input id="cAddr" autocomplete="street-address"></label>
+                </div>
+
+                <div class="panel grid" data-mode="email" hidden>
+                    <label class="wide">Para <input id="mTo" type="email" placeholder="nombre@correo.com"></label>
+                    <label class="wide">Asunto <input id="mSubject"></label>
+                    <label class="wide">Mensaje <textarea id="mBody" rows="3"></textarea></label>
+                </div>
+
+                <div class="panel grid" data-mode="sms" hidden>
+                    <label class="wide">Número <input id="sPhone" type="tel" placeholder="+54 9 11 1234 5678"></label>
+                    <label class="wide">Mensaje <textarea id="sBody" rows="3"></textarea></label>
+                </div>
+
+                <div class="panel grid" data-mode="tel" hidden>
+                    <label class="wide">Número <input id="tPhone" type="tel" placeholder="+54 9 11 1234 5678"></label>
+                </div>
+
+                <div class="panel grid" data-mode="geo" hidden>
+                    <div class="wide">
+                        <label for="geo">Coordenadas</label>
+                        <div class="row">
+                            <input id="geo" placeholder="-34.6037, -58.3816" inputmode="decimal">
+                            <button id="locate" class="btn" type="button">Mi ubicación</button>
+                        </div>
+                    </div>
+                    <p class="note wide">En Google Maps, clic derecho sobre el lugar y copiá las coordenadas.</p>
+                </div>
+
+                <div class="panel grid" data-mode="event" hidden>
+                    <label class="wide">Título <input id="eTitle"></label>
+                    <label>Inicio <input id="eStart" type="datetime-local"></label>
+                    <label>Fin <input id="eEnd" type="datetime-local"></label>
+                    <label class="wide">Lugar <input id="ePlace"></label>
+                    <label class="wide">Descripción <textarea id="eNotes" rows="2"></textarea></label>
+                </div>
+
+                <button class="btn primary generate" type="submit">Generar QR</button>
                 <p id="msg" class="msg" role="status" aria-live="polite"></p>
             </form>
 
