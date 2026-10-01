@@ -1,0 +1,108 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+:root {
+  --bg: #eef0f7;
+  --surface: #f8f9fd;
+  --elevated: #ffffff;
+  --line: #dde1ee;
+  --fg: #1a1b26;
+  --muted: #5d6385;
+  --accent: #4c6ef5;
+  --accent-2: #8b5cf6;
+  --cyan: #0891b2;
+  --danger: #e5484d;
+  --warn: #c2850c;
+  --glow: rgb(76 110 245 / 0.14);
+  color-scheme: light;
+}
+
+[data-theme='dark'] {
+  --bg: #1a1b26;
+  --surface: #1f2335;
+  --elevated: #262b42;
+  --line: #2f3550;
+  --fg: #e4e7f5;
+  --muted: #8b93b8;
+  --accent: #7aa2f7;
+  --accent-2: #bb9af7;
+  --cyan: #7dcfff;
+  --danger: #f7768e;
+  --warn: #e0af68;
+  --glow: rgb(122 162 247 / 0.16);
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-elevated: var(--elevated);
+  --color-line: var(--line);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
+  --color-cyan: var(--cyan);
+  --color-danger: var(--danger);
+  --color-warn: var(--warn);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, 'Segoe UI', sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-bg text-fg antialiased;
+    background-image:
+      radial-gradient(60rem 30rem at 85% -10%, var(--glow), transparent 70%),
+      radial-gradient(40rem 24rem at -10% 10%, rgb(187 154 247 / 0.08), transparent 70%);
+    background-attachment: fixed;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-accent;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--accent) 35%, transparent);
+  }
+}
+
+@layer components {
+  .input {
+    @apply h-10 w-full rounded-xl border border-line bg-elevated px-3 text-sm text-fg shadow-xs transition
+      placeholder:text-muted/70 hover:border-muted/50 focus:border-accent focus:ring-4 focus:ring-accent/15 focus:outline-none
+      aria-invalid:border-danger aria-invalid:focus:ring-danger/15 disabled:opacity-50;
+  }
+
+  textarea.input {
+    @apply h-auto min-h-20 resize-y py-2.5;
+  }
+
+  .label {
+    @apply mb-1.5 block text-xs font-medium text-muted;
+  }
+
+  .btn {
+    @apply inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-line bg-elevated px-4 text-sm font-medium
+      text-fg shadow-xs transition hover:border-muted/50 hover:bg-surface active:scale-[.98] disabled:pointer-events-none disabled:opacity-50;
+  }
+
+  .btn-primary {
+    @apply border-transparent bg-linear-to-r from-accent to-accent-2 text-white shadow-lg shadow-accent/20 hover:brightness-110;
+  }
+
+  /* tarjeta seleccionable con radio nativo oculto */
+  .tile {
+    @apply relative flex cursor-pointer flex-col items-center gap-1.5 rounded-xl border border-line bg-elevated p-2.5 text-xs
+      text-muted transition hover:border-muted/50 hover:text-fg
+      has-checked:border-accent has-checked:bg-accent/10 has-checked:text-fg has-checked:ring-4 has-checked:ring-accent/10
+      has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
