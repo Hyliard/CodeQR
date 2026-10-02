@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Logo } from '@/components/Logo';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { QRGenerator } from '@/components/qr/QRGenerator';
@@ -7,10 +8,10 @@ export default function Home() {
     <>
       <header className="sticky top-0 z-20 border-b border-line bg-bg">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
-          <a href="/" className="flex items-center gap-2.5 font-semibold tracking-tight">
+          <Link href="/" className="flex items-center gap-2.5 font-semibold tracking-tight">
             <Logo className="size-7 text-accent" />
             Generador de QR
-          </a>
+          </Link>
           <ThemeToggle />
         </div>
       </header>
