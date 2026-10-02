@@ -24,7 +24,7 @@ export const DEFAULT_DESIGN: Design = {
   fg: '#1a1b26',
   bg: '#ffffff',
   gradient: 'none',
-  custom: { from: '#7aa2f7', to: '#bb9af7', angle: 45 },
+  custom: { from: '#1d2024', to: '#2a7d60', angle: 45 },
   dots: 'square',
   eyes: 'square'
 };
