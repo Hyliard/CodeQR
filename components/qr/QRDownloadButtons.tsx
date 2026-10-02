@@ -88,7 +88,7 @@ export function QRDownloadButtons({ svgRef, ready, data }: Props) {
           {msg?.ok ? <Check className="size-3.5" aria-hidden /> : <Copy className="size-3.5" aria-hidden />}
           Copiar contenido
         </button>
-        <p role="status" aria-live="polite" className={`text-xs ${msg?.ok ? 'text-emerald-500' : 'text-danger'}`}>
+        <p role="status" aria-live="polite" className={`text-xs ${msg?.ok ? 'text-accent' : 'text-danger'}`}>
           {msg?.text}
         </p>
       </div>

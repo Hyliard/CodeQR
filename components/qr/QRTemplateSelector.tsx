@@ -15,12 +15,9 @@ export function QRTemplateSelector() {
           <button
             type="button"
             onClick={() => applyTemplate(t.id)}
-            className="group flex w-36 flex-col items-start gap-3 rounded-xl border border-line bg-elevated p-3 text-left transition hover:-translate-y-0.5 hover:border-accent/50 hover:shadow-lg hover:shadow-accent/10"
+            className="flex w-36 flex-col items-start gap-3 rounded-xl border border-line bg-elevated p-3 text-left transition hover:border-accent/60"
           >
-            <span
-              className="grid size-9 place-items-center rounded-lg text-white"
-              style={{ background: `linear-gradient(135deg, ${t.frameColor}, ${t.design.fg ?? t.frameColor})` }}
-            >
+            <span className="grid size-9 place-items-center rounded-lg text-white" style={{ background: t.frameColor }}>
               {t.logo.kind === 'preset' ? (
                 <img src={logoSrc(t.logo.id)} alt="" className="size-9 rounded-lg" />
               ) : (

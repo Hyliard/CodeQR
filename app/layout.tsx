@@ -5,14 +5,14 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
 
 export const metadata: Metadata = {
-  title: 'QR Studio — Generador de códigos QR',
+  title: 'Generador de QR',
   description: 'Creá códigos QR personalizados para enlaces, WiFi, redes, pagos y más. Logos, marcos y exportación en alta calidad.'
 };
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: dark)', color: '#1a1b26' },
-    { media: '(prefers-color-scheme: light)', color: '#eef0f7' }
+    { media: '(prefers-color-scheme: dark)', color: '#16181d' },
+    { media: '(prefers-color-scheme: light)', color: '#f4f4f1' }
   ]
 };
 

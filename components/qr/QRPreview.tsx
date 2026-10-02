@@ -9,7 +9,7 @@ import { QRDownloadButtons } from './QRDownloadButtons';
 import { QRGraphic } from './QRGraphic';
 
 // se muestra difuminado mientras todavía no hay contenido válido
-const SAMPLE = 'https://qr.studio/preview';
+const SAMPLE = 'https://example.com';
 
 export function QRPreview() {
   const result = useEncoded();
@@ -37,7 +37,7 @@ export function QRPreview() {
   const Icon = status.tone === 'ok' ? CheckCircle2 : status.tone === 'error' ? TriangleAlert : CircleDashed;
 
   return (
-    <section aria-labelledby="preview-title" className="overflow-hidden rounded-3xl border border-line bg-surface/80 shadow-xl shadow-black/10 backdrop-blur-sm">
+    <section aria-labelledby="preview-title" className="overflow-hidden rounded-3xl border border-line bg-surface">
       <header className="flex items-center justify-between gap-3 border-b border-line px-5 py-4 sm:px-6">
         <div>
           <h2 id="preview-title" className="text-sm font-semibold">Vista previa</h2>
@@ -56,11 +56,7 @@ export function QRPreview() {
         )}
       </header>
 
-      <div className="relative grid place-items-center bg-[radial-gradient(circle_at_center,var(--glow),transparent_70%)] px-6 py-8 sm:py-12">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-40 [background-image:radial-gradient(var(--line)_1px,transparent_1px)] [background-size:18px_18px]"
-        />
+      <div className="grid place-items-center bg-bg/60 px-6 py-8 sm:py-12">
         {matrix ? (
           <QRGraphic
             ref={svgRef}
@@ -69,10 +65,10 @@ export function QRPreview() {
             logo={logo}
             frame={frame}
             label={`Código QR de ${QR_TYPES[type].label}`}
-            className={`relative h-auto w-full max-w-[280px] drop-shadow-2xl transition duration-300 sm:max-w-[360px] ${ready ? '' : 'opacity-40 blur-[3px] grayscale'}`}
+            className={`h-auto w-full max-w-[280px] drop-shadow-md transition duration-300 sm:max-w-[360px] ${ready ? '' : 'opacity-40 blur-[3px] grayscale'}`}
           />
         ) : (
-          <div className="relative grid aspect-square w-full max-w-[280px] place-items-center rounded-3xl border border-dashed border-line text-sm text-muted sm:max-w-[360px]">
+          <div className="grid aspect-square w-full max-w-[280px] place-items-center rounded-3xl border border-dashed border-line text-sm text-muted sm:max-w-[360px]">
             Sin vista previa
           </div>
         )}
@@ -82,7 +78,7 @@ export function QRPreview() {
         role="status"
         aria-live="polite"
         className={`flex items-center justify-center gap-2 border-t border-line px-5 py-3 text-center text-xs font-medium ${
-          status.tone === 'ok' ? 'text-emerald-500 dark:text-emerald-400' : status.tone === 'error' ? 'text-danger' : 'text-muted'
+          status.tone === 'ok' ? 'text-accent' : status.tone === 'error' ? 'text-danger' : 'text-muted'
         }`}
       >
         <Icon className="size-3.5 shrink-0" aria-hidden />
